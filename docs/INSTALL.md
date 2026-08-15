@@ -2,9 +2,9 @@
 
 KINGAI OPS Free/Core is distributed as a **prebuilt proprietary Linux binary**. This public repository contains the installer, updater, documentation and binary-release metadata, but not the proprietary core source.
 
-## One-command install
+Current public binary release: **v0.9.1**.
 
-When an official binary Release is available in this repository:
+## One-command install
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/kingaiwork/kingaiopsfree/main/install.sh | sudo sh
@@ -33,7 +33,7 @@ Save first configuration baseline
   ↓
 Run first VPS security assessment
   ↓
-Install systemd / OpenRC / runit integration when available
+Install systemd / OpenRC / runit / SysV integration when available
   ↓
 Start kingaid
   ↓
@@ -167,19 +167,23 @@ The local Console uses HTTP because it is bound to loopback and is intended to b
 
 ## Supported release architectures
 
-The production build currently validates these primary release architectures:
+The v0.9.1 production pipeline builds and verifies these Linux release assets:
 
 ```text
 kingai-linux-amd64
 kingai-linux-arm64
 kingai-linux-386
 kingai-linux-armv7
+kingai-linux-armv6
+kingai-linux-ppc64
 kingai-linux-ppc64le
+kingai-linux-mips64le
 kingai-linux-s390x
 kingai-linux-riscv64
+kingai-linux-loong64
 ```
 
-Additional architectures can be added when they pass the same static-build and runtime qualification gates. Architecture availability is separate from Linux-distribution compatibility.
+Architecture availability is separate from Linux-distribution compatibility. A successful static build means a release binary exists for the architecture; platform-specific service/package/security behavior is still capability-detected at runtime.
 
 ## Linux compatibility model
 
@@ -193,13 +197,18 @@ KINGAI OPS uses capability detection rather than a narrow distro-version allowli
 - Void;
 - other Linux systems when the required kernel/procfs capabilities are present.
 
-Automatic service integration currently covers:
+Detected package-manager families include apt, DNF/microdnf/YUM, Zypper, pacman, apk, XBPS and additional read-only detection for rpm-ostree, Portage/emerge, eopkg, slackpkg and Nix tooling. KINGAI OPS only enables operations for adapters that have an explicit safe implementation.
+
+Automatic `kingaid` service integration currently covers:
 
 ```text
 systemd
 OpenRC
 runit
+SysV init
 ```
+
+Core service discovery/control can also recognize dinit where `dinitctl` is available. s6 and BusyBox init are detected conservatively and use read-only/manual fallback unless a platform-native integration is provided.
 
 If another/custom init system is detected, installation can still complete without opening a public port; run the daemon manually or provide the platform-native service wrapper:
 
@@ -207,7 +216,7 @@ If another/custom init system is detected, installation can still complete witho
 KINGAI_CONFIG=/etc/kingaiops/config.json /usr/local/bin/kingai daemon
 ```
 
-Immutable/atomic distributions, NixOS, embedded appliances and heavily customized systems may require platform-native integration. KINGAI OPS should degrade safely rather than claim identical mutation support on every Linux variant.
+Immutable/atomic distributions, NixOS, embedded appliances and heavily customized systems may require platform-native integration. KINGAI OPS degrades safely rather than claim identical mutation support on every Linux variant.
 
 ## Verification model
 
@@ -250,7 +259,7 @@ State-changing host operations remain disabled unless explicitly enabled in poli
 }
 ```
 
-The local HTTP API remains read-only. Approved mutations are currently performed through typed CLI operations rather than a generic remote shell endpoint.
+The local HTTP API remains read-oriented and authenticated. Approved host mutations are performed through typed, policy-gated CLI operations rather than a generic remote shell endpoint.
 
 ## Service-manager integration
 
@@ -265,6 +274,10 @@ The installer creates `/etc/init.d/kingaid`, enables it for the default runlevel
 ### runit
 
 The installer creates `/etc/sv/kingaid/run`, links it into the active service directory when present and verifies `sv status`.
+
+### SysV init
+
+The installer can create a guarded `/etc/init.d/kingaid` wrapper with an LSB header, a protected PID file, process-command verification and normal `start|stop|restart|status` behavior. It registers through `update-rc.d` or `chkconfig` when available and verifies the local health endpoint after startup.
 
 ## Updates
 
