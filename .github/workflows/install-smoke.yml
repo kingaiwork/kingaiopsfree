@@ -1,0 +1,65 @@
+name: KINGAI OPS Public Install Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'install.sh'
+      - 'update.sh'
+      - 'uninstall.sh'
+      - '.github/workflows/install-smoke.yml'
+  release:
+    types: [published]
+  workflow_dispatch:
+  schedule:
+    - cron: '23 8 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingai-ops-public-install-smoke
+  cancel-in-progress: false
+
+jobs:
+  one-click-install:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Execute the public one-command installer
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/kingaiwork/kingaiopsfree/main/install.sh | sudo env KINGAI_SKIP_SERVICE=1 sh
+      - name: Verify installed binary and first-deploy artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo /usr/local/bin/kingai version
+          sudo /usr/local/bin/kingai admin status | tee /tmp/admin-status.json
+          grep -q '"configured": true' /tmp/admin-status.json
+          test -s /etc/kingaiops/admin.json
+          test "$(stat -c '%a' /etc/kingaiops/admin.json)" = '600'
+          test -s /var/lib/kingaiops/baseline.json
+          test -s /var/lib/kingaiops/reports/first-security-check.json
+          test -s /var/lib/kingaiops/initial-admin.txt
+          test "$(stat -c '%a' /var/lib/kingaiops/initial-admin.txt)" = '600'
+          sudo /usr/local/bin/kingai health >/tmp/health.json
+          grep -q '"drift"' /tmp/health.json || true
+      - name: Validate public release checksum directly
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://github.com/kingaiwork/kingaiopsfree/releases/latest/download'
+          curl --proto '=https' --tlsv1.2 -fsSL "$base/SHA256SUMS" -o /tmp/SHA256SUMS
+          curl --proto '=https' --tlsv1.2 -fsSL "$base/kingai-linux-amd64" -o /tmp/kingai-linux-amd64
+          expected="$(awk '$2=="kingai-linux-amd64"{print $1}' /tmp/SHA256SUMS)"
+          actual="$(sha256sum /tmp/kingai-linux-amd64 | awk '{print $1}')"
+          test -n "$expected"
+          test "$expected" = "$actual"
+      - name: Clean ephemeral runner
+        if: always()
+        run: |
+          sudo sh uninstall.sh || true
+          sudo rm -rf /etc/kingaiops /var/lib/kingaiops /var/log/kingaiops
