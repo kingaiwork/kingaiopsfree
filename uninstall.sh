@@ -11,8 +11,14 @@ if command -v systemctl >/dev/null 2>&1 && [ -f /etc/systemd/system/kingaid.serv
 fi
 
 if [ -f /etc/init.d/kingaid ]; then
-  if command -v rc-service >/dev/null 2>&1; then rc-service kingaid stop >/dev/null 2>&1 || true; fi
-  if command -v rc-update >/dev/null 2>&1; then rc-update del kingaid default >/dev/null 2>&1 || true; fi
+  if command -v rc-service >/dev/null 2>&1 && command -v rc-update >/dev/null 2>&1; then
+    rc-service kingaid stop >/dev/null 2>&1 || true
+    rc-update del kingaid default >/dev/null 2>&1 || true
+  else
+    if command -v service >/dev/null 2>&1; then service kingaid stop >/dev/null 2>&1 || true; else /etc/init.d/kingaid stop >/dev/null 2>&1 || true; fi
+    if command -v update-rc.d >/dev/null 2>&1; then update-rc.d -f kingaid remove >/dev/null 2>&1 || true; fi
+    if command -v chkconfig >/dev/null 2>&1; then chkconfig kingaid off >/dev/null 2>&1 || true; chkconfig --del kingaid >/dev/null 2>&1 || true; fi
+  fi
   rm -f /etc/init.d/kingaid
 fi
 
