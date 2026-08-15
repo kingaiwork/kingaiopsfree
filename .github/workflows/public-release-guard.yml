@@ -1,5 +1,6 @@
 name: public-release-guard
 
+# Final distribution guard: this public repository must never receive proprietary core source.
 on:
   push:
     branches: [main]
