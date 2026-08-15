@@ -1,0 +1,55 @@
+name: public-release-guard
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reject proprietary source paths and source files
+        shell: bash
+        run: |
+          set -euo pipefail
+          forbidden_paths=(
+            "cmd/kingai"
+            "agent"
+            "sentinel"
+            "executor"
+            "policy"
+            "approval"
+            "control-plane"
+            "private"
+          )
+          for path in "${forbidden_paths[@]}"; do
+            if [[ -e "$path" ]]; then
+              echo "Forbidden proprietary path in public repository: $path" >&2
+              exit 1
+            fi
+          done
+
+          if find . -type f \( -name '*.go' -o -name '*.rs' -o -name '*.c' -o -name '*.cc' -o -name '*.cpp' \) -print -quit | grep -q .; then
+            echo "Compiled/core source file detected in public repository." >&2
+            find . -type f \( -name '*.go' -o -name '*.rs' -o -name '*.c' -o -name '*.cc' -o -name '*.cpp' \) -print
+            exit 1
+          fi
+
+      - name: Validate public shell scripts
+        run: |
+          sh -n install.sh
+          sh -n update.sh
+          sh -n uninstall.sh
+
+      - name: Ensure repository states proprietary source policy
+        run: |
+          grep -qi "not open source" README.md
+          grep -qi "proprietary" LICENSE-EULA.md
