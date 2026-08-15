@@ -10,15 +10,28 @@ if command -v systemctl >/dev/null 2>&1 && [ -f /etc/systemd/system/kingaid.serv
   systemctl daemon-reload >/dev/null 2>&1 || true
 fi
 
+if [ -f /etc/init.d/kingaid ]; then
+  if command -v rc-service >/dev/null 2>&1; then rc-service kingaid stop >/dev/null 2>&1 || true; fi
+  if command -v rc-update >/dev/null 2>&1; then rc-update del kingaid default >/dev/null 2>&1 || true; fi
+  rm -f /etc/init.d/kingaid
+fi
+
+if [ -d /etc/sv/kingaid ]; then
+  if command -v sv >/dev/null 2>&1; then sv down kingaid >/dev/null 2>&1 || true; fi
+  rm -f /var/service/kingaid /etc/service/kingaid 2>/dev/null || true
+  rm -rf /etc/sv/kingaid
+fi
+
 rm -f /usr/local/bin/kingai /usr/local/bin/kai /usr/local/bin/kingai.previous
 
 cat <<'EOF'
-KINGAI OPS binary/service removed.
+KINGAI OPS binary and managed service were removed.
 
-Configuration, audit history and backups were intentionally preserved:
-  /etc/kingaiops
-  /var/lib/kingaiops
-  /var/log/kingaiops
+Configuration and local operational history were intentionally preserved:
+  /etc/kingaiops        # includes the local administrator hash
+  /var/lib/kingaiops    # baseline, first security report, backups, state
+  /var/log/kingaiops    # audit and daemon logs
 
-Delete those directories manually only after confirming the data is no longer required.
+No plaintext password is stored in /etc/kingaiops/admin.json.
+Delete these directories manually only after confirming the data is no longer required.
 EOF
