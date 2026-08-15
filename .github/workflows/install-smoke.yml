@@ -36,17 +36,32 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          require_file(){
+            path="$1"
+            if ! sudo test -s "$path"; then echo "::error::Missing or empty first-deploy artifact: $path"; exit 1; fi
+            sudo stat -c '%a %U:%G %s %n' "$path"
+          }
+          require_mode(){
+            path="$1" expected="$2"
+            actual="$(sudo stat -c '%a' "$path")"
+            if [ "$actual" != "$expected" ]; then echo "::error::Unexpected mode for $path: $actual (expected $expected)"; exit 1; fi
+          }
           sudo /usr/local/bin/kingai version
           sudo /usr/local/bin/kingai admin status | tee /tmp/admin-status.json
-          grep -q '"configured": true' /tmp/admin-status.json
-          test -s /etc/kingaiops/admin.json
-          test "$(stat -c '%a' /etc/kingaiops/admin.json)" = '600'
-          test -s /var/lib/kingaiops/baseline.json
-          test -s /var/lib/kingaiops/reports/first-security-check.json
-          test -s /var/lib/kingaiops/initial-admin.txt
-          test "$(stat -c '%a' /var/lib/kingaiops/initial-admin.txt)" = '600'
-          sudo /usr/local/bin/kingai health >/tmp/health.json
-          grep -q '"drift"' /tmp/health.json || true
+          grep -q '"configured": true' /tmp/admin-status.json || { echo '::error::Local administrator was not configured'; exit 1; }
+          require_file /etc/kingaiops/admin.json
+          require_mode /etc/kingaiops/admin.json 600
+          require_file /var/lib/kingaiops/baseline.json
+          require_file /var/lib/kingaiops/reports/first-security-check.json
+          require_file /var/lib/kingaiops/initial-admin.txt
+          require_mode /var/lib/kingaiops/initial-admin.txt 600
+          if ! sudo /usr/local/bin/kingai health >/tmp/health.json; then
+            echo '::error::kingai health returned non-zero'
+            cat /tmp/health.json || true
+            exit 1
+          fi
+          test -s /tmp/health.json || { echo '::error::kingai health returned an empty document'; exit 1; }
+          grep -q '"status"' /tmp/health.json || { echo '::error::Health JSON has no status'; cat /tmp/health.json; exit 1; }
       - name: Validate public release checksum directly
         shell: bash
         run: |
@@ -56,8 +71,9 @@ jobs:
           curl --proto '=https' --tlsv1.2 -fsSL "$base/kingai-linux-amd64" -o /tmp/kingai-linux-amd64
           expected="$(awk '$2=="kingai-linux-amd64"{print $1}' /tmp/SHA256SUMS)"
           actual="$(sha256sum /tmp/kingai-linux-amd64 | awk '{print $1}')"
-          test -n "$expected"
-          test "$expected" = "$actual"
+          test -n "$expected" || { echo '::error::amd64 checksum missing from SHA256SUMS'; exit 1; }
+          test "$expected" = "$actual" || { echo '::error::Public amd64 binary checksum mismatch'; exit 1; }
+          echo "PUBLIC_RELEASE_SHA256_VERIFIED $actual"
       - name: Clean ephemeral runner
         if: always()
         run: |
