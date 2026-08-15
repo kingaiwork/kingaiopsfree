@@ -1,0 +1,61 @@
+name: publish-v0.9.1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-v0.9.1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      RELEASE_TAG: v0.9.1
+      ARTIFACT_URL: "https://sdmntprwestus.oaiusercontent.com/files/00000000-ffd8-8230-9b61-498123cc9c9f/raw?se=2026-08-15T08%3A49%3A00Z&sp=r&sv=2026-02-06&sr=b&scid=b4085b94-0fb6-5341-94bb-877d172ecc00&skoid=89c13f8f-c33a-46d8-9bf3-ad7158c7790a&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-08-14T23%3A29%3A36Z&ske=2026-08-15T23%3A29%3A36Z&sks=b&skv=2026-02-06&sig=5HqVlepWgnDkzcLyDby/oZN4PVEhJkgEgBbmYeqSGEQ%3D"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download verified private build artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          curl --proto '=https' --tlsv1.2 -fL --retry 3 --connect-timeout 15 --max-time 240 "$ARTIFACT_URL" -o /tmp/kingai-ops-release.zip
+          unzip -q /tmp/kingai-ops-release.zip -d dist
+          test -s dist/SHA256SUMS
+      - name: Verify release payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd dist
+          sha256sum -c SHA256SUMS
+          expected=(amd64 arm64 386 armv7 armv6 ppc64 ppc64le mips64le s390x riscv64 loong64)
+          for arch in "${expected[@]}"; do
+            test -s "kingai-linux-${arch}"
+            chmod 0755 "kingai-linux-${arch}"
+          done
+          count=$(find . -maxdepth 1 -type f -name 'kingai-linux-*' | wc -l)
+          test "$count" -eq 11
+          if find . -maxdepth 1 -type f \( -name '*.go' -o -name '*.rs' -o -name '*.c' -o -name '*.cpp' \) -print -quit | grep -q .; then
+            echo 'Source file found in release payload; refusing publication.' >&2
+            exit 1
+          fi
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" --repo kingaiwork/kingaiopsfree >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" dist/SHA256SUMS dist/kingai-linux-* --repo kingaiwork/kingaiopsfree --clobber
+          else
+            gh release create "$RELEASE_TAG" dist/SHA256SUMS dist/kingai-linux-* \
+              --repo kingaiwork/kingaiopsfree \
+              --target main \
+              --title "KINGAI OPS Free $RELEASE_TAG" \
+              --notes "Authenticated first-deploy release. Creates or preserves a local administrator, runs the first VPS security assessment and baseline, protects /api/v1 behind local authentication, supports verified rollback, and ships static Linux binaries for 11 validated architectures. Proprietary core source is not included."
+          fi
