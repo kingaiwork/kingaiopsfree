@@ -64,9 +64,13 @@ case "$machine" in
   aarch64|arm64) arch="arm64" ;;
   i386|i486|i586|i686) arch="386" ;;
   armv7l|armv7*) arch="armv7" ;;
+  armv6l|armv6*) arch="armv6" ;;
   ppc64le) arch="ppc64le" ;;
+  ppc64) arch="ppc64" ;;
+  mips64el|mips64le) arch="mips64le" ;;
   s390x) arch="s390x" ;;
   riscv64) arch="riscv64" ;;
+  loongarch64|loong64) arch="loong64" ;;
   *) die "no official KINGAI OPS binary is published for architecture: $machine" ;;
 esac
 
@@ -204,6 +208,30 @@ RUNIT
   chmod 0755 /etc/sv/kingaid/run
   if [ -d /var/service ]; then ln -sfn /etc/sv/kingaid /var/service/kingaid; elif [ -d /etc/service ]; then ln -sfn /etc/sv/kingaid /etc/service/kingaid; fi
   if sv up kingaid >/dev/null 2>&1 && sv status kingaid >/dev/null 2>&1; then init="runit"; else service_ok=0; init="runit"; fi
+elif [ -d /etc/init.d ] && { command -v service >/dev/null 2>&1 || command -v update-rc.d >/dev/null 2>&1 || command -v chkconfig >/dev/null 2>&1; }; then
+  cat > /etc/init.d/kingaid <<'SYSV'
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: kingaid
+# Required-Start: $local_fs $network
+# Required-Stop: $local_fs $network
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: KINGAI OPS node daemon
+### END INIT INFO
+DAEMON=/usr/local/bin/kingai
+PIDFILE=/var/run/kingaid.pid
+LOGFILE=/var/log/kingaiops/daemon.log
+CONFIG=/etc/kingaiops/config.json
+is_running(){ [ -r "$PIDFILE" ] || return 1; pid=$(cat "$PIDFILE" 2>/dev/null || true); case "$pid" in ''|*[!0-9]*) return 1;; esac; [ -r "/proc/$pid/cmdline" ] || return 1; cmd=$(tr '\000' ' ' < "/proc/$pid/cmdline" 2>/dev/null || true); case "$cmd" in *"/usr/local/bin/kingai daemon"*) return 0;; *) return 1;; esac; }
+start_daemon(){ is_running && return 0; mkdir -p /var/lib/kingaiops /var/log/kingaiops; chmod 0750 /var/lib/kingaiops /var/log/kingaiops; umask 027; KINGAI_CONFIG="$CONFIG" nohup "$DAEMON" daemon >>"$LOGFILE" 2>&1 </dev/null & echo $! > "$PIDFILE"; chmod 0600 "$PIDFILE"; i=0; while [ "$i" -lt 10 ]; do is_running && return 0; i=$((i+1)); sleep 1; done; rm -f "$PIDFILE"; return 1; }
+stop_daemon(){ if ! is_running; then rm -f "$PIDFILE"; return 0; fi; pid=$(cat "$PIDFILE"); kill "$pid" 2>/dev/null || true; i=0; while [ "$i" -lt 10 ]; do if ! kill -0 "$pid" 2>/dev/null; then rm -f "$PIDFILE"; return 0; fi; i=$((i+1)); sleep 1; done; is_running && kill -KILL "$pid" 2>/dev/null || true; rm -f "$PIDFILE"; }
+case "${1:-}" in start) start_daemon;; stop) stop_daemon;; restart) stop_daemon; start_daemon;; status) if is_running; then echo "kingaid is running"; exit 0; else echo "kingaid is stopped"; exit 3; fi;; *) echo "Usage: $0 {start|stop|restart|status}" >&2; exit 2;; esac
+SYSV
+  chmod 0755 /etc/init.d/kingaid
+  command -v update-rc.d >/dev/null 2>&1 && update-rc.d kingaid defaults >/dev/null 2>&1 || true
+  if command -v chkconfig >/dev/null 2>&1; then chkconfig --add kingaid >/dev/null 2>&1 || true; chkconfig kingaid on >/dev/null 2>&1 || true; fi
+  if { command -v service >/dev/null 2>&1 && service kingaid restart; } || /etc/init.d/kingaid restart; then init="sysvinit"; else service_ok=0; init="sysvinit"; fi
 else
   say "No supported service manager detected. KINGAI OPS is installed but not auto-started."
   say "Manual: KINGAI_CONFIG=/etc/kingaiops/config.json /usr/local/bin/kingai daemon"
@@ -224,6 +252,7 @@ if [ "$service_ok" -ne 1 ]; then
       systemd) systemctl restart kingaid.service >/dev/null 2>&1 || true ;;
       openrc) rc-service kingaid restart >/dev/null 2>&1 || true ;;
       runit) sv restart kingaid >/dev/null 2>&1 || true ;;
+      sysvinit) /etc/init.d/kingaid restart >/dev/null 2>&1 || true ;;
     esac
     die "deployment failed; previous binary restored"
   fi
