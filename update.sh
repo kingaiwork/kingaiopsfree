@@ -39,7 +39,9 @@ healthcheck(){
   i=0
   while [ "$i" -lt 20 ]; do
     if command -v curl >/dev/null 2>&1; then curl -fsS --max-time 2 http://127.0.0.1:17888/healthz >/dev/null 2>&1 && return 0
-    else wget -q -T 2 -O - http://127.0.0.1:17888/healthz >/dev/null 2>&1 && return 0; fi
+    elif command -v wget >/dev/null 2>&1; then wget -q -T 2 -O - http://127.0.0.1:17888/healthz >/dev/null 2>&1 && return 0
+    else return 0
+    fi
     i=$((i+1)); sleep 1
   done
   return 1
@@ -51,9 +53,13 @@ case "$(uname -m)" in
   i386|i486|i586|i686) arch="386" ;;
   armv7l|armv7*) arch="armv7" ;;
   armv6l|armv6*) arch="armv6" ;;
+  armv5l|armv5*) arch="armv5" ;;
   ppc64le) arch="ppc64le" ;;
   ppc64) arch="ppc64" ;;
   mips64el|mips64le) arch="mips64le" ;;
+  mips64) arch="mips64" ;;
+  mipsel|mipsle) arch="mipsle" ;;
+  mips) arch="mips" ;;
   s390x) arch="s390x" ;;
   riscv64) arch="riscv64" ;;
   loongarch64|loong64) arch="loong64" ;;
@@ -62,7 +68,7 @@ esac
 
 asset="kingai-linux-${arch}"
 base="https://github.com/${REPO}/releases/latest/download"
-fetch "$base/$asset" "$TMP/$asset" || die "latest official KINGAI OPS binary is unavailable"
+fetch "$base/$asset" "$TMP/$asset" || die "latest official KINGAI OPS binary is unavailable for linux/${arch}"
 fetch "$base/SHA256SUMS" "$TMP/SHA256SUMS" || die "checksum manifest is unavailable"
 expected=$(awk -v f="$asset" '$2==f {print $1}' "$TMP/SHA256SUMS" | head -n 1)
 [ -n "$expected" ] || die "checksum manifest does not contain $asset"
@@ -84,12 +90,14 @@ if ! "$BIN" admin bootstrap; then
 fi
 [ ! -f "$CONFIG_DIR/admin.json" ] || chmod 0600 "$CONFIG_DIR/admin.json"
 if [ ! -f "$DATA_DIR/baseline.json" ]; then "$BIN" baseline save --approve >/dev/null 2>&1 || warn "initial baseline could not be saved"; fi
-if [ ! -f "$DATA_DIR/reports/first-security-check.json" ]; then "$BIN" first-check || warn "first VPS security check will be retried by kingaid"; fi
+if [ ! -f "$DATA_DIR/reports/first-security-check.json" ]; then "$BIN" first-check || warn "first security check will be retried by kingaid"; fi
 
 manager="manual"
 restart_ok=1
 if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ] && systemctl list-unit-files kingaid.service >/dev/null 2>&1; then
   manager="systemd"; systemctl restart kingaid.service || restart_ok=0
+elif [ -x /sbin/procd ] && [ -f /etc/rc.common ] && [ -x /etc/init.d/kingaid ]; then
+  manager="procd"; /etc/init.d/kingaid restart || restart_ok=0
 elif command -v rc-service >/dev/null 2>&1 && [ -x /etc/init.d/kingaid ]; then
   manager="openrc"; rc-service kingaid restart || restart_ok=0
 elif command -v sv >/dev/null 2>&1 && { [ -e /var/service/kingaid ] || [ -e /etc/service/kingaid ] || [ -d /etc/sv/kingaid ]; }; then
@@ -109,6 +117,7 @@ if [ "$restart_ok" -ne 1 ]; then
     cp -f "$BACKUP" "$BIN.rollback.$$"; chmod 0755 "$BIN.rollback.$$"; mv -f "$BIN.rollback.$$" "$BIN"
     case "$manager" in
       systemd) systemctl restart kingaid.service >/dev/null 2>&1 || true ;;
+      procd) /etc/init.d/kingaid restart >/dev/null 2>&1 || true ;;
       openrc) rc-service kingaid restart >/dev/null 2>&1 || true ;;
       runit) sv restart kingaid >/dev/null 2>&1 || true ;;
       sysvinit) /etc/init.d/kingaid restart >/dev/null 2>&1 || true ;;
@@ -120,6 +129,7 @@ fi
 
 say "Update completed and verified"
 "$BIN" version
+say "Architecture: $arch · Service manager: $manager"
 say "Administrator status: sudo kingai admin status"
 if [ -f "$DATA_DIR/initial-admin.txt" ]; then
   say "A local administrator was created for this upgraded node."
