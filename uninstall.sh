@@ -11,7 +11,10 @@ if command -v systemctl >/dev/null 2>&1 && [ -f /etc/systemd/system/kingaid.serv
 fi
 
 if [ -f /etc/init.d/kingaid ]; then
-  if command -v rc-service >/dev/null 2>&1 && command -v rc-update >/dev/null 2>&1; then
+  if [ -x /sbin/procd ] && [ -f /etc/rc.common ]; then
+    /etc/init.d/kingaid stop >/dev/null 2>&1 || true
+    /etc/init.d/kingaid disable >/dev/null 2>&1 || true
+  elif command -v rc-service >/dev/null 2>&1 && command -v rc-update >/dev/null 2>&1; then
     rc-service kingaid stop >/dev/null 2>&1 || true
     rc-update del kingaid default >/dev/null 2>&1 || true
   else
@@ -34,7 +37,7 @@ cat <<'EOF'
 KINGAI OPS binary and managed service were removed.
 
 Configuration and local operational history were intentionally preserved:
-  /etc/kingaiops        # includes the local administrator hash
+  /etc/kingaiops        # includes the local administrator hash and install metadata
   /var/lib/kingaiops    # baseline, first security report, backups, state
   /var/log/kingaiops    # audit and daemon logs
 
