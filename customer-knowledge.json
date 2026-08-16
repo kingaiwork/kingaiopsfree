@@ -1,0 +1,8 @@
+{
+  "schema":"kingai.customer-knowledge-source.v1",
+  "project_id":"ops",
+  "visibility":"public",
+  "customer_safe_paths":["README.md"],
+  "publish_policy":"Customer answers may use only the currently published release, verified platform/profile support and public operations guidance. Future release pipeline capabilities must not be presented as already available.",
+  "private_repository_access":false
+}
