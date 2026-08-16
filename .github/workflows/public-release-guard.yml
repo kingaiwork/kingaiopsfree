@@ -11,6 +11,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: kingai-ops-public-release-guard-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   guard:
     runs-on: ubuntu-latest
@@ -49,6 +53,30 @@ jobs:
           sh -n install.sh
           sh -n update.sh
           sh -n uninstall.sh
+
+      - name: Lock Universal Bootstrap v2 safety contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'KINGAI OPS Universal Bootstrap v2' install.sh
+          grep -q 'auto|server|edge|iot|minimal' install.sh
+          grep -q '127.0.0.1:17888' install.sh
+          grep -q 'init="procd"' install.sh
+          grep -q 'USE_PROCD=1' install.sh
+          grep -q 'stop) stop_daemon;;' install.sh
+          grep -q 'SHA-256 verification failed; refusing installation' install.sh
+          grep -q 'Rolling back to the previous KINGAI OPS binary' install.sh
+          grep -q -- '--enroll-token-file' install.sh
+          if grep -Eq -- '--enroll-token($|[ =])' install.sh; then
+            echo 'Plain enrollment-token CLI input is forbidden; use a root-only token file.' >&2
+            exit 1
+          fi
+          for setting in allowServiceRestart allowContainerRestart allowLocalBackup allowLocalRestore; do
+            grep -Eq "\"$setting\"[[:space:]]*:[[:space:]]*false" install.sh || { echo "Unsafe default for $setting" >&2; exit 1; }
+          done
+          for arch in amd64 arm64 386 armv7 armv6 armv5 ppc64 ppc64le mips mipsle mips64 mips64le s390x riscv64 loong64; do
+            grep -q "arch=\"$arch\"" install.sh || { echo "Missing Universal Bootstrap architecture: $arch" >&2; exit 1; }
+          done
 
       - name: Ensure repository states proprietary source policy
         run: |
