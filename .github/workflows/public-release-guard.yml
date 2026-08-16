@@ -76,7 +76,19 @@ jobs:
           done
           for arch in amd64 arm64 386 armv7 armv6 armv5 ppc64 ppc64le mips mipsle mips64 mips64le s390x riscv64 loong64; do
             grep -q "arch=\"$arch\"" install.sh || { echo "Missing Universal Bootstrap architecture: $arch" >&2; exit 1; }
+            grep -q "arch=\"$arch\"" update.sh || { echo "Updater architecture drift: $arch" >&2; exit 1; }
           done
+
+      - name: Lock update rollback and procd lifecycle
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'manager="procd"' update.sh
+          grep -q 'procd) /etc/init.d/kingaid restart' update.sh
+          grep -q 'update rolled back to the previous binary' update.sh
+          grep -q '/etc/init.d/kingaid disable' uninstall.sh
+          grep -q '/sbin/procd' uninstall.sh
+          grep -q 'Configuration and local operational history were intentionally preserved' uninstall.sh
 
       - name: Ensure repository states proprietary source policy
         run: |
