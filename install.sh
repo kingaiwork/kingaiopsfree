@@ -372,7 +372,7 @@ CONFIG="$CONFIG_DIR/config.json"
 is_running(){ [ -r "\$PIDFILE" ] || return 1; pid=\$(cat "\$PIDFILE" 2>/dev/null || true); case "\$pid" in ''|*[!0-9]*) return 1;; esac; [ -r "/proc/\$pid/cmdline" ] || return 1; cmd=\$(tr '\\000' ' ' < "/proc/\$pid/cmdline" 2>/dev/null || true); case "\$cmd" in *"kingai daemon"*) return 0;; *) return 1;; esac; }
 start_daemon(){ is_running && return 0; mkdir -p "$DATA_DIR" "$LOG_DIR"; chmod 0750 "$DATA_DIR" "$LOG_DIR"; umask 027; KINGAI_CONFIG="\$CONFIG" nohup "\$DAEMON" daemon >>"\$LOGFILE" 2>&1 </dev/null & echo \$! > "\$PIDFILE"; chmod 0600 "\$PIDFILE"; }
 stop_daemon(){ if ! is_running; then rm -f "\$PIDFILE"; return 0; fi; pid=\$(cat "\$PIDFILE"); kill "\$pid" 2>/dev/null || true; i=0; while [ "\$i" -lt 10 ]; do if ! kill -0 "\$pid" 2>/dev/null; then rm -f "\$PIDFILE"; return 0; fi; i=\$((i+1)); sleep 1; done; kill -KILL "\$pid" 2>/dev/null || true; rm -f "\$PIDFILE"; }
-case "\${1:-}" in start) start_daemon;; stop) stop_daemon; start_daemon;; restart) stop_daemon; start_daemon;; status) if is_running; then echo "kingaid is running"; exit 0; else echo "kingaid is stopped"; exit 3; fi;; *) echo "Usage: \$0 {start|stop|restart|status}" >&2; exit 2;; esac
+case "\${1:-}" in start) start_daemon;; stop) stop_daemon;; restart) stop_daemon; start_daemon;; status) if is_running; then echo "kingaid is running"; exit 0; else echo "kingaid is stopped"; exit 3; fi;; *) echo "Usage: \$0 {start|stop|restart|status}" >&2; exit 2;; esac
 SYSV
   chmod 0755 /etc/init.d/kingaid
   command -v update-rc.d >/dev/null 2>&1 && update-rc.d kingaid defaults >/dev/null 2>&1 || true
