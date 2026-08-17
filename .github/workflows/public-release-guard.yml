@@ -1,4 +1,4 @@
-name: public-release-guard
+name: public-release-guard-zero-bill
 
 # Final distribution guard: this public repository must never receive proprietary core source.
 on:
@@ -17,47 +17,39 @@ concurrency:
 
 jobs:
   guard:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, kingai-vps]
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Zero-bill public distribution guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -RIn --exclude-dir=.git -E 'OPENAI_API_KEY|ANTHROPIC_API_KEY|DEEPSEEK_API_KEY|GEMINI_API_KEY|CLOUDFLARE_API_TOKEN|SUPABASE_.*SECRET|r2_buckets|JOBS_QUEUE|JOBS_DLQ|actions/upload-artifact|runs-on:[[:space:]]*(ubuntu|windows|macos)' .
 
       - name: Reject proprietary source paths and source files
         shell: bash
         run: |
           set -euo pipefail
-          forbidden_paths=(
-            "cmd/kingai"
-            "agent"
-            "sentinel"
-            "executor"
-            "policy"
-            "approval"
-            "control-plane"
-            "private"
-          )
+          forbidden_paths=("cmd/kingai" "agent" "sentinel" "executor" "policy" "approval" "control-plane" "private")
           for path in "${forbidden_paths[@]}"; do
-            if [[ -e "$path" ]]; then
-              echo "Forbidden proprietary path in public repository: $path" >&2
-              exit 1
-            fi
+            if [[ -e "$path" ]]; then echo "Forbidden proprietary path in public repository: $path" >&2; exit 1; fi
           done
-
           if find . -type f \( -name '*.go' -o -name '*.rs' -o -name '*.c' -o -name '*.cc' -o -name '*.cpp' \) -print -quit | grep -q .; then
-            echo "Compiled/core source file detected in public repository." >&2
-            find . -type f \( -name '*.go' -o -name '*.rs' -o -name '*.c' -o -name '*.cc' -o -name '*.cpp' \) -print
+            echo 'Compiled/core source file detected in public repository.' >&2
             exit 1
           fi
 
-      - name: Validate public shell scripts
-        run: |
-          sh -n install.sh
-          sh -n update.sh
-          sh -n uninstall.sh
-
-      - name: Lock Universal Bootstrap v2 safety contract
+      - name: Validate public shell scripts and bootstrap safety
         shell: bash
         run: |
           set -euo pipefail
+          sh -n install.sh
+          sh -n update.sh
+          sh -n uninstall.sh
           grep -q 'KINGAI OPS Universal Bootstrap v2' install.sh
           grep -q 'auto|server|edge|iot|minimal' install.sh
           grep -q '127.0.0.1:17888' install.sh
@@ -67,16 +59,13 @@ jobs:
           grep -q 'SHA-256 verification failed; refusing installation' install.sh
           grep -q 'Rolling back to the previous KINGAI OPS binary' install.sh
           grep -q -- '--enroll-token-file' install.sh
-          if grep -Eq -- '--enroll-token($|[ =])' install.sh; then
-            echo 'Plain enrollment-token CLI input is forbidden; use a root-only token file.' >&2
-            exit 1
-          fi
+          if grep -Eq -- '--enroll-token($|[ =])' install.sh; then echo 'Plain enrollment-token CLI input is forbidden.' >&2; exit 1; fi
           for setting in allowServiceRestart allowContainerRestart allowLocalBackup allowLocalRestore; do
             grep -Eq "\"$setting\"[[:space:]]*:[[:space:]]*false" install.sh || { echo "Unsafe default for $setting" >&2; exit 1; }
           done
           for arch in amd64 arm64 386 armv7 armv6 armv5 ppc64 ppc64le mips mipsle mips64 mips64le s390x riscv64 loong64; do
-            grep -q "arch=\"$arch\"" install.sh || { echo "Missing Universal Bootstrap architecture: $arch" >&2; exit 1; }
-            grep -q "arch=\"$arch\"" update.sh || { echo "Updater architecture drift: $arch" >&2; exit 1; }
+            grep -q "arch=\"$arch\"" install.sh || exit 1
+            grep -q "arch=\"$arch\"" update.sh || exit 1
           done
 
       - name: Lock update rollback and procd lifecycle
@@ -89,8 +78,5 @@ jobs:
           grep -q '/etc/init.d/kingaid disable' uninstall.sh
           grep -q '/sbin/procd' uninstall.sh
           grep -q 'Configuration and local operational history were intentionally preserved' uninstall.sh
-
-      - name: Ensure repository states proprietary source policy
-        run: |
-          grep -qi "not open source" README.md
-          grep -qi "proprietary" LICENSE-EULA.md
+          grep -qi 'not open source' README.md
+          grep -qi 'proprietary' LICENSE-EULA.md
