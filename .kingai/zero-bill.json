@@ -1,0 +1,19 @@
+{
+  "schema":"kingai.repo-zero-bill.v1",
+  "enabled":true,
+  "central_authority":"kingaiwork/KINGAIASE:config/zero-bill-policy.json",
+  "repo":"kingaiwork/kingaiopsfree",
+  "role":"public-free-distribution",
+  "runtime_authority":false,
+  "automatic_ci":"vps-self-hosted-only",
+  "install_smoke":"vps-disposable-container",
+  "public_release":"read-only-validation-by-default",
+  "automatic_release_upload":"forbidden",
+  "production_secrets":"forbidden",
+  "paid_ai_api":"forbidden",
+  "paid_cloud_runtime":"forbidden",
+  "r2":"forbidden",
+  "queues":"forbidden",
+  "canonical_private_core":"kingaiwork/kingai-ops",
+  "vps_evidence":"/srv/kingai/qa/kingaiopsfree"
+}
