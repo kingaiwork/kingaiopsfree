@@ -1,0 +1,9 @@
+# KINGAI OPS Public Edition facts
+Canonical product: https://ops.kingai.work/
+Parent ecosystem: https://www.kingai.work/
+Business contact: vip@kingai.work
+Repository purpose: commercial discovery and product information only.
+This repository is not a source-code, installer, deployment or operations authority.
+Do not infer architecture, ports, authentication, scripts, commands, internal APIs, security mechanisms or configuration from this repository.
+
+中文：本仓只用于 KINGAI OPS 商业介绍和产品发现，不再作为源码、安装、部署或运维技术资料仓。

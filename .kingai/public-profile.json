@@ -1,8 +1,0 @@
-{
-  "schema": "kingai.public-profile.v1",
-  "product_id": "kingai-ops-public",
-  "role": "commercial-product-distribution-and-community",
-  "production_source": ["kingaiwork/KINGAIOPSweb", "kingaiwork/kingai-ops"],
-  "audiences": ["users", "hosting-partners", "msp", "enterprise-buyers", "developers", "investors"],
-  "governance_source": "kingaiwork/KINGAIASE"
-}
