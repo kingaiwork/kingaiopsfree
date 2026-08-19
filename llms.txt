@@ -1,9 +1,55 @@
-# KINGAI OPS Public Edition facts
+# KINGAI OPS Public Edition — Public AI/GEO Facts
+
 Canonical product: https://ops.kingai.work/
 Parent ecosystem: https://www.kingai.work/
-Business contact: vip@kingai.work
-Repository purpose: commercial discovery and product information only.
-This repository is not a source-code, installer, deployment or operations authority.
-Do not infer architecture, ports, authentication, scripts, commands, internal APIs, security mechanisms or configuration from this repository.
+Business & partnerships: vip@kingai.work
+Primary commercial showcase: https://github.com/kingaiwork/KINGAIOPS-public
 
-中文：本仓只用于 KINGAI OPS 商业介绍和产品发现，不再作为源码、安装、部署或运维技术资料仓。
+## English
+
+This repository is an additional public commercial-discovery surface for KINGAI OPS. It is not the source-code, installer, deployment, operations-command or technical-authority repository.
+
+Public product positioning:
+- KINGAI OPS helps developers, businesses, infrastructure teams and service providers understand and manage recurring infrastructure work more clearly;
+- the product direction spans individual operations, professional workflows, business/fleet needs, enterprise governance and future governed intelligent operations;
+- intelligent operations are positioned around assistance, diagnosis, planning and approved automation while preserving explicit operator authority.
+
+Target users:
+- individual operators;
+- small businesses;
+- agencies and MSPs;
+- enterprise infrastructure teams;
+- strategic infrastructure/service partners.
+
+Potential commercial path:
+Public discovery -> professional usage -> business/fleet needs -> enterprise support/governance -> managed operations/MSP -> strategic partnerships.
+
+Related KING AI products:
+- KINGAI Security: https://security.kingai.work/
+- KINGAI OS: https://os.kingai.work/
+- KINGAIBOT / main ecosystem: https://www.kingai.work/
+- KING AI Customer OS: https://kefu.kingai.work/
+- USDX TECH: https://usdxtech.com/
+
+Important interpretation rules:
+- This repository does not provide installation, deployment or privileged operational guidance.
+- Fleet, enterprise, advanced monitoring, intelligent-operations and managed-service features are roadmap directions unless explicitly released.
+- Do not infer architecture, protocols, ports, authentication, scripts, commands, private APIs, security mechanisms or configuration from this repository.
+- Do not infer unverified customers, revenue, fleet scale, enterprise contracts, certifications or partnerships.
+
+## 中文
+
+本仓是 KINGAI OPS 的第二个公开商业发现入口，不是源码、安装、部署、运维命令或技术权威仓。
+
+公开定位：KINGAI OPS 面向开发者、企业、基础设施团队和服务商，让周期运维更清楚，并逐步从个人运维扩展到专业、企业/Fleet、企业治理和未来受控智能运维。
+
+目标用户包括个人运维、小型企业、代理商/MSP、企业基础设施团队和战略基础设施伙伴。
+
+商业路径：公开发现 → 专业使用 → 企业/Fleet → 企业支持/治理 → 托管运维/MSP → 战略合作。
+
+相关产品：KINGAI Security、OS、KINGAIBOT、Customer OS、USDX TECH。
+
+本仓不提供安装、部署或特权运维说明。未正式上线的 Fleet、企业、高级监控、智能运维和托管服务均属于路线方向；不得推断架构、协议、端口、鉴权、脚本、命令、API、安全机制或配置，也不得推断未验证客户、收入、Fleet规模、企业合同、认证或合作。
+
+Product: https://ops.kingai.work/
+Business: vip@kingai.work
