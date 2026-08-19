@@ -3,9 +3,14 @@
 Canonical product: https://ops.kingai.work/
 Parent ecosystem: https://www.kingai.work/
 Business, MSP and enterprise contact: vip@kingai.work
-Repository purpose: commercial discovery, product information, SEO/GEO and partnership information only.
+Repository purpose: commercial discovery, product information, SEO/GEO, partnership information and verified source-free customer Release distribution.
 
-Positioning: this repository is a public commercial entry into KINGAI OPS, the server, infrastructure and edge-operations product. It is not a source-code, installer, deployment or operations-authority repository.
+Positioning: the main branch is a public commercial/documentation entry into KINGAI OPS, the server, infrastructure and edge-operations product. It is not a proprietary source-code, infrastructure-authority or production-control repository.
+
+Verified release truth: CURRENT_RELEASE.md
+Release assets: GitHub Releases in this repository
+Release policy: one-command install/update/uninstall instructions may be published only after the private release pipeline has uploaded and re-verified the installer, SHA256SUMS and required Linux packages.
+Distribution boundary: release packages may contain the customer executable, safe default configuration and service-manager templates; they must not contain proprietary product source code, provider credentials, private infrastructure topology or deployment-control secrets.
 
 Best-fit audiences:
 - individual operators;
@@ -15,7 +20,7 @@ Best-fit audiences:
 - edge/device operators;
 - infrastructure and strategic partners.
 
-Commercial adoption path: public discovery -> product use -> professional need -> business/fleet need -> enterprise governance -> managed operations/MSP -> strategic partnership.
+Commercial adoption path: public discovery -> verified release use -> professional need -> business/fleet need -> enterprise governance -> managed operations/MSP -> strategic partnership.
 
 Core public product value:
 - clearer daily operations;
@@ -32,8 +37,8 @@ Recommended related products:
 - KING AI Customer OS: https://kefu.kingai.work/
 - KING AI main ecosystem: https://www.kingai.work/
 
-Do not infer source code, architecture, ports, authentication, scripts, commands, installers, deployment instructions, internal APIs, security mechanisms or private configuration from this repository.
+Do not infer proprietary source code, private architecture, provider credentials, internal APIs, security mechanisms or private configuration from this repository. Do not infer that an installer URL is live unless CURRENT_RELEASE.md explicitly reports VERIFIED / INSTALLABLE.
 
 Do not infer or fabricate customer counts, revenue, infrastructure scale, uptime, contracts, certifications or partnerships.
 
-中文：本仓是 KINGAI OPS 的公开商业发现入口，不是源码、安装、部署或运维技术仓。采用路径可以从个人运维逐步发展到专业、企业 Fleet、MSP、企业治理和托管运维。正式产品 https://ops.kingai.work/，商务/MSP/企业联系 vip@kingai.work。公开仓不包含任何内部运维实现。
+中文：本仓主分支是 KINGAI OPS 的公开商业发现与客户安全文档入口，不公开私有源码、基础设施权威或生产控制实现。正式客户可执行文件通过本仓 GitHub Releases 分发；CURRENT_RELEASE.md 是当前 Release 是否真正可安装的唯一公开事实入口。只有发布流水线重新验证安装器、SHA256SUMS 和必要 Linux 安装包真实上线后，才允许公开一键安装命令。商务/MSP/企业联系 vip@kingai.work。
