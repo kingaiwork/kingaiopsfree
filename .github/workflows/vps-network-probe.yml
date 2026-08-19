@@ -9,39 +9,60 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   probe:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Probe VPS reachability
+      - name: Probe VPS reachability and publish result
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -uo pipefail
           host='147.135.113.65'
-          echo '===== VPS EXTERNAL NETWORK PROBE ====='
-          echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-          echo "Target: ${host}"
-          echo
+          report=/tmp/vps-network-probe.txt
+          : > "$report"
+          log(){ printf '%s\n' "$*" | tee -a "$report"; }
+          log '===== VPS EXTERNAL NETWORK PROBE ====='
+          log "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          log "Target: ${host}"
+          log ''
           for port in 22 58888 80 443 6080 18789; do
             if timeout 5 bash -c "</dev/tcp/${host}/${port}" 2>/dev/null; then
-              echo "TCP ${port}: OPEN"
+              log "TCP ${port}: OPEN"
             else
-              echo "TCP ${port}: CLOSED_OR_FILTERED"
+              log "TCP ${port}: CLOSED_OR_FILTERED"
             fi
           done
-          echo
-          echo '===== SSH BANNERS ====='
+          log ''
+          log '===== SSH BANNERS ====='
           for port in 22 58888; do
-            echo "-- port ${port} --"
-            timeout 5 bash -c "exec 3<>/dev/tcp/${host}/${port}; head -c 200 <&3" 2>&1 || true
-            echo
+            log "-- port ${port} --"
+            banner=$(timeout 5 bash -c "exec 3<>/dev/tcp/${host}/${port}; head -c 200 <&3" 2>&1 || true)
+            log "${banner:-NO_BANNER}"
           done
-          echo '===== HTTP PROBES ====='
+          log ''
+          log '===== HTTP PROBES ====='
           for url in "http://${host}/" "https://${host}/" "http://${host}:6080/" "http://${host}:18789/"; do
             code=$(curl -k -LIsS --connect-timeout 5 --max-time 10 -o /dev/null -w '%{http_code}' "$url" 2>/dev/null || true)
             [ -n "$code" ] || code=000
-            echo "${url} -> ${code}"
+            log "${url} -> ${code}"
           done
-          echo 'RESULT: PROBE_COMPLETE'
+          log 'RESULT: PROBE_COMPLETE'
+
+          body=$(python3 - <<'PY'
+import json
+text=open('/tmp/vps-network-probe.txt').read()
+print(json.dumps({'body':'```text\n'+text+'\n```'}))
+PY
+)
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            -H 'Content-Type: application/json' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/4/comments" \
+            -d "$body" >/dev/null
