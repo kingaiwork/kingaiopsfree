@@ -10,23 +10,33 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe VPS ports
+      - name: Probe VPS IPv4 and IPv6
         run: |
-          host=147.135.113.65
+          v4=147.135.113.65
+          v6=2604:2dc0:101:200::3631
           echo "UTC=$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
-          echo "TARGET=$host"
+          echo "IPV4=$v4"
+          echo "IPV6=$v6"
+          echo "PING4_BEGIN"
+          ping -c 3 -W 2 "$v4" || true
+          echo "PING4_END"
+          echo "PING6_BEGIN"
+          ping -6 -c 3 -W 2 "$v6" || true
+          echo "PING6_END"
           for port in 22 58888 80 443 6080 18789; do
-            if timeout 5 bash -c "</dev/tcp/$host/$port" 2>/dev/null; then
-              echo "TCP $port OPEN"
+            if timeout 5 bash -c "</dev/tcp/$v4/$port" 2>/dev/null; then
+              echo "IPV4_TCP $port OPEN"
             else
-              echo "TCP $port CLOSED_OR_FILTERED"
+              echo "IPV4_TCP $port CLOSED_OR_FILTERED"
             fi
           done
-          echo "SSH_22_BANNER_BEGIN"
-          timeout 5 bash -c "exec 3<>/dev/tcp/$host/22; head -c 200 <&3" 2>&1 || true
-          echo "SSH_22_BANNER_END"
-          echo "SSH_58888_BANNER_BEGIN"
-          timeout 5 bash -c "exec 3<>/dev/tcp/$host/58888; head -c 200 <&3" 2>&1 || true
-          echo "SSH_58888_BANNER_END"
+          for port in 22 58888 80 443 6080 18789; do
+            if timeout 5 nc -6 -z -v "$v6" "$port" >/tmp/nc6 2>&1; then
+              echo "IPV6_TCP $port OPEN"
+            else
+              echo "IPV6_TCP $port CLOSED_OR_FILTERED"
+            fi
+            cat /tmp/nc6 || true
+          done
           echo "PROBE_COMPLETE"
           exit 1
