@@ -1,0 +1,47 @@
+name: VPS Network Probe
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/vps-network-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe VPS reachability
+        shell: bash
+        run: |
+          set -uo pipefail
+          host='147.135.113.65'
+          echo '===== VPS EXTERNAL NETWORK PROBE ====='
+          echo "UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          echo "Target: ${host}"
+          echo
+          for port in 22 58888 80 443 6080 18789; do
+            if timeout 5 bash -c "</dev/tcp/${host}/${port}" 2>/dev/null; then
+              echo "TCP ${port}: OPEN"
+            else
+              echo "TCP ${port}: CLOSED_OR_FILTERED"
+            fi
+          done
+          echo
+          echo '===== SSH BANNERS ====='
+          for port in 22 58888; do
+            echo "-- port ${port} --"
+            timeout 5 bash -c "exec 3<>/dev/tcp/${host}/${port}; head -c 200 <&3" 2>&1 || true
+            echo
+          done
+          echo '===== HTTP PROBES ====='
+          for url in "http://${host}/" "https://${host}/" "http://${host}:6080/" "http://${host}:18789/"; do
+            code=$(curl -k -LIsS --connect-timeout 5 --max-time 10 -o /dev/null -w '%{http_code}' "$url" 2>/dev/null || true)
+            [ -n "$code" ] || code=000
+            echo "${url} -> ${code}"
+          done
+          echo 'RESULT: PROBE_COMPLETE'
