@@ -8,13 +8,11 @@ Business & partnerships: vip@kingai.work
 
 This repository main branch is a commercial information and product-discovery surface. It does not publish the proprietary KINGAI OPS source code, private architecture, provider configuration, credentials, internal APIs, infrastructure topology or security implementation. Customer executable distribution is provided separately through **verified GitHub Release assets** built from the private production authority.
 
-## Install the current verified Linux release
+## Current verified release
 
-```bash
-curl -fsSL https://github.com/kingaiwork/kingaiopsfree/releases/latest/download/kingai-install.sh | sudo sh
-```
+See [`CURRENT_RELEASE.md`](CURRENT_RELEASE.md). That file is updated by the release pipeline **only after** the installer, checksum manifest and required Linux packages have all been uploaded and verified. If it says the installer is pending, do not use an unpublished one-command install URL yet.
 
-The release installer selects the supported Linux architecture, downloads the corresponding source-free package and verifies it against the published `SHA256SUMS` before installation. Release assets include updater/uninstaller entry points as well. Availability is tied to the latest successfully published release; this repository main branch remains documentation-only.
+The verified release installer selects the supported Linux architecture, downloads the corresponding source-free package and verifies it against the published `SHA256SUMS` before installation. Release assets also provide updater and uninstaller entry points. The repository main branch remains documentation-only.
 
 ## English
 
@@ -55,22 +53,13 @@ Infrastructure products can be difficult to evaluate from technical documentatio
 
 ### Adoption journey
 
-**Discover → understand the operating value → install a verified release → standardize recurring work → add more systems → involve a team → evaluate business/enterprise/managed options.**
+**Discover → understand the operating value → use a verified release → standardize recurring work → add more systems → involve a team → evaluate business/enterprise/managed options.**
 
 ### When the broader product relationship becomes relevant
 
-A user may begin with one server and later need:
+A user may begin with one server and later need more systems, stronger operational consistency, team workflows, business support, MSP / multi-customer capabilities, enterprise governance, managed operations or strategic infrastructure integration.
 
-- more systems;
-- stronger operational consistency;
-- team workflows;
-- business support;
-- MSP / multi-customer capabilities;
-- enterprise governance;
-- managed operations;
-- strategic infrastructure integration.
-
-Exact availability depends on the current product release. Future capabilities remain roadmap directions until released and verified.
+Exact availability depends on the current verified product release. Future capabilities remain roadmap directions until released and verified.
 
 ### Explore related KING AI products
 
@@ -87,7 +76,7 @@ Exact availability depends on the current product release. Future capabilities r
 No. The main branch is a public commercial/documentation surface. Proprietary implementation remains private.
 
 **Where are customer binaries distributed?**  
-Through GitHub Releases in this repository. The current installer URL above resolves to the latest verified release asset.
+Through GitHub Releases in this repository. `CURRENT_RELEASE.md` is the authority for whether the one-command installer has actually passed the publication gate.
 
 **Is KINGAI OPS only for enterprises?**  
 No. The adoption path can begin with individual operators and grow toward larger relationships.
@@ -104,15 +93,11 @@ vip@kingai.work
 
 ### 先把产品价值看懂，再决定使用到什么深度
 
-KINGAI OPS 面向开发者、企业、基础设施团队和服务商。这个 Public Edition 主分支的作用不是公开私有源码和内部架构，而是帮助用户理解产品价值、选择使用方式，并提供经过校验的正式 Release 安装入口。
+KINGAI OPS 面向开发者、企业、基础设施团队和服务商。Public Edition 主分支不公开私有源码和内部架构，而是帮助用户理解产品价值，并提供经过验证的正式 Release 信息。
 
-### 当前 Linux 正式版安装
+### 当前正式 Release
 
-```bash
-curl -fsSL https://github.com/kingaiwork/kingaiopsfree/releases/latest/download/kingai-install.sh | sudo sh
-```
-
-安装器会识别支持的 Linux 架构，下载对应的无源码发布包，并使用同一 Release 中的 `SHA256SUMS` 校验后再安装。主分支仍保持商业介绍和客户安全文档；可执行文件通过 Releases 分发。
+请查看 [`CURRENT_RELEASE.md`](CURRENT_RELEASE.md)。只有当发布流水线确认安装器、SHA-256 校验清单和必要 Linux 安装包都已经真实上传成功后，这个文件才会写出一键安装命令。如果仍显示“pending verification”，就说明新的安装入口尚未完成生产验证。
 
 ### 产品价值
 
@@ -120,16 +105,12 @@ curl -fsSL https://github.com/kingaiwork/kingaiopsfree/releases/latest/download/
 
 ### 采用路径
 
-**发现 → 理解价值 → 安装正式 Release → 标准化周期工作 → 增加更多系统 → 团队采用 → 评估企业/托管服务。**
-
-### 相关产品
-
-OS 提供计算环境，Security 提供保护，Office 提供文档和分析，Customer OS 连接客户业务，Tools 提供轻量入口。
+**发现 → 理解价值 → 使用经过验证的 Release → 标准化周期工作 → 增加更多系统 → 团队采用 → 评估企业/托管服务。**
 
 ### 常见问题
 
 **这是源码仓吗？** 不是，主分支是商业与产品发现入口，私有实现不会公开。  
-**安装包在哪里？** 通过本仓库 GitHub Releases 发布，使用上面的 latest 安装入口即可。  
+**安装包在哪里？** 通过本仓库 GitHub Releases 发布，`CURRENT_RELEASE.md` 是当前安装状态权威。  
 **只适合大企业吗？** 不是，可以从个人运维开始。  
 **公开内部技术吗？** 不公开。  
 **商务/MSP/企业合作？** vip@kingai.work
