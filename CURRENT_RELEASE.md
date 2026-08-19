@@ -1,13 +1,17 @@
-# KINGAI OPS — Current Verified Release
+# KINGAI OPS — Legacy Release Compatibility
 
-Status: **release installer pending verification**
+Status: **Frozen / historical compatibility only**
 
-The repository main branch is intentionally documentation-only. Customer installation commands are published here **only after** the release pipeline has uploaded and verified the installer, SHA-256 manifest and required Linux packages in GitHub Releases.
+This repository no longer publishes new KINGAI OPS releases and is not the current release authority.
 
-The next source-free distribution is prepared as `v0.9.2`, but it is not marked installable here until the release assets have passed the publication gate.
+Existing historical GitHub Release assets are retained only so older links and already-published installers remain recoverable. Do not interpret those assets, this file, or the repository-global `releases/latest` endpoint as current KINGAI OPS release truth.
 
-For product information, visit https://ops.kingai.work/.
+New verified KINGAI OPS releases, including v0.9.2 and later, are published only through the unified KING AI public release hub after remote asset verification, checksum validation, and installation/startup gates pass:
 
-For release history and manually downloadable assets, use this repository's **Releases** section.
+https://github.com/kingaiwork/KINGAIASE-public/blob/main/RELEASES.md
+
+Official KINGAI OPS:
+
+https://ops.kingai.work/
 
 © 2026 KINGAI / USDX TECH LLC
