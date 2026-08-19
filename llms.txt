@@ -1,44 +1,11 @@
-# KINGAI OPS Public Edition facts
+# KINGAI OPS Public Edition legacy facts
+Status: legacy public discovery/history/release-migration repository.
+Official product: https://ops.kingai.work/
+Current public hub: https://github.com/kingaiwork/KINGAIASE-public
+Unified release policy: https://github.com/kingaiwork/KINGAIASE-public/blob/main/RELEASES.md
+Business contact: vip@kingai.work
+Authority rule: this repository is not the current product, installation or release authority.
+Historical immutable assets may remain relevant to older installations, but they do not make this repository current release truth.
+Do not infer current source, architecture, ports, authentication, installers, privileged operations, private APIs, security mechanisms, deployment configuration or current version from historical content here.
 
-Canonical product: https://ops.kingai.work/
-Parent ecosystem: https://www.kingai.work/
-Business, MSP and enterprise contact: vip@kingai.work
-Repository purpose: commercial discovery, product information, SEO/GEO, partnership information and verified source-free customer Release distribution.
-
-Positioning: the main branch is a public commercial/documentation entry into KINGAI OPS, the server, infrastructure and edge-operations product. It is not a proprietary source-code, infrastructure-authority or production-control repository.
-
-Verified release truth: CURRENT_RELEASE.md
-Release assets: GitHub Releases in this repository
-Release policy: one-command install/update/uninstall instructions may be published only after the private release pipeline has uploaded and re-verified the installer, SHA256SUMS and required Linux packages.
-Distribution boundary: release packages may contain the customer executable, safe default configuration and service-manager templates; they must not contain proprietary product source code, provider credentials, private infrastructure topology or deployment-control secrets.
-
-Best-fit audiences:
-- individual operators;
-- small businesses;
-- agencies and MSPs;
-- enterprise infrastructure teams;
-- edge/device operators;
-- infrastructure and strategic partners.
-
-Commercial adoption path: public discovery -> verified release use -> professional need -> business/fleet need -> enterprise governance -> managed operations/MSP -> strategic partnership.
-
-Core public product value:
-- clearer daily operations;
-- reduced repeated administration;
-- better change awareness;
-- growth from one system to larger environments;
-- governed intelligent-operations direction;
-- professional/business/MSP/enterprise relationship potential.
-
-Recommended related products:
-- KINGAI OS: https://os.kingai.work/
-- KINGAI Security: https://security.kingai.work/
-- KINGAI Office: https://office.kingai.work/
-- KING AI Customer OS: https://kefu.kingai.work/
-- KING AI main ecosystem: https://www.kingai.work/
-
-Do not infer proprietary source code, private architecture, provider credentials, internal APIs, security mechanisms or private configuration from this repository. Do not infer that an installer URL is live unless CURRENT_RELEASE.md explicitly reports VERIFIED / INSTALLABLE.
-
-Do not infer or fabricate customer counts, revenue, infrastructure scale, uptime, contracts, certifications or partnerships.
-
-中文：本仓主分支是 KINGAI OPS 的公开商业发现与客户安全文档入口，不公开私有源码、基础设施权威或生产控制实现。正式客户可执行文件通过本仓 GitHub Releases 分发；CURRENT_RELEASE.md 是当前 Release 是否真正可安装的唯一公开事实入口。只有发布流水线重新验证安装器、SHA256SUMS 和必要 Linux 安装包真实上线后，才允许公开一键安装命令。商务/MSP/企业联系 vip@kingai.work。
+中文：本仓是 KINGAI OPS 的 legacy 公开/历史发布迁移入口，不再是当前产品、安装或发布权威。当前信息请使用 https://ops.kingai.work/ 和 https://github.com/kingaiwork/KINGAIASE-public 。
