@@ -1,21 +1,32 @@
 # KINGAI OPS Public Edition — Legacy Repository
 
-**Status: Frozen / legacy public and release surface**
+> **Moved / 已迁移**
+>
+> This repository is a legacy public discovery, historical release and migration surface. It is no longer the active public product, installation or release authority for KINGAI OPS.
 
-This repository is retained for historical links, previous release references and repository history during KING AI consolidation. It is no longer the current public product or release authority and must not receive new proprietary implementation, deployment architecture or private operational details.
+**Official product:** https://ops.kingai.work/  
+**Current KING AI public hub:** https://github.com/kingaiwork/KINGAIASE-public  
+**Release policy:** https://github.com/kingaiwork/KINGAIASE-public/blob/main/RELEASES.md  
+**Business:** vip@kingai.work
 
-Current public KING AI ecosystem and verified-release index:
+## English
 
-https://github.com/kingaiwork/KINGAIASE-public
+KINGAI OPS is the KING AI infrastructure operations product for servers, infrastructure and edge environments, with a longer-term direction toward fleet management and governed intelligent operations.
 
-Current release policy:
+This repository previously served as a public edition/release surface. Under the current repository layout, current product discovery and verified release truth converge on the unified public hub and official product website.
 
-https://github.com/kingaiwork/KINGAIASE-public/blob/main/RELEASES.md
+Historical immutable assets may remain relevant to existing installations. Their presence does not make this repository the current release authority.
 
-Official KINGAI OPS:
+---
 
-https://ops.kingai.work/
+## 中文
 
-Existing historical GitHub Release assets are retained during migration. Their existence does not make this repository the current source authority. The private KINGAI OPS repository remains authoritative.
+KINGAI OPS 面向服务器、基础设施和边缘环境，并逐步扩展 Fleet 与受控智能运维方向。
 
-Business / MSP / enterprise: vip@kingai.work
+本仓过去承担过公开版本/发布入口角色，但在当前仓位布局下已经属于 **Legacy / 历史发布与迁移入口**。
+
+当前产品和正式公开发布信息请使用：
+
+- 官方产品：https://ops.kingai.work/
+- 统一公开中心：https://github.com/kingaiwork/KINGAIASE-public
+- 发布规则：https://github.com/kingaiwork/KINGAIASE-public/blob/main/RELEASES.md
