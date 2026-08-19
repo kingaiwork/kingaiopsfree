@@ -1,18 +1,26 @@
 # KINGAI OPS — Public Edition
 
-**A commercial discovery entry for the KINGAI OPS operations platform.**
+**A commercial discovery and verified release entry for the KINGAI OPS operations platform.**
 
 Official product: https://ops.kingai.work/  
 KING AI: https://www.kingai.work/  
 Business & partnerships: vip@kingai.work
 
-This repository is a commercial information and product-discovery repository only. It does not distribute source code, installers, operational scripts, privileged commands, architecture, ports, authentication design, deployment instructions, internal APIs, security implementation or private configuration.
+This repository main branch is a commercial information and product-discovery surface. It does not publish the proprietary KINGAI OPS source code, private architecture, provider configuration, credentials, internal APIs, infrastructure topology or security implementation. Customer executable distribution is provided separately through **verified GitHub Release assets** built from the private production authority.
+
+## Install the current verified Linux release
+
+```bash
+curl -fsSL https://github.com/kingaiwork/kingaiopsfree/releases/latest/download/kingai-install.sh | sudo sh
+```
+
+The release installer selects the supported Linux architecture, downloads the corresponding source-free package and verifies it against the published `SHA256SUMS` before installation. Release assets include updater/uninstaller entry points as well. Availability is tied to the latest successfully published release; this repository main branch remains documentation-only.
 
 ## English
 
 ### Understand the product before choosing how deeply to adopt it
 
-KINGAI OPS is designed for developers, businesses, infrastructure teams and service providers that want a clearer operating experience for servers, systems and edge environments. This Public Edition repository explains the product, the business value and the adoption path without exposing production internals.
+KINGAI OPS is designed for developers, businesses, infrastructure teams and service providers that want a clearer operating experience for servers, systems and edge environments. This Public Edition explains the product, the business value and the adoption path without exposing production internals.
 
 ### Why this public entry exists
 
@@ -47,7 +55,7 @@ Infrastructure products can be difficult to evaluate from technical documentatio
 
 ### Adoption journey
 
-**Discover → understand the operating value → try the product → standardize recurring work → add more systems → involve a team → evaluate business/enterprise/managed options.**
+**Discover → understand the operating value → install a verified release → standardize recurring work → add more systems → involve a team → evaluate business/enterprise/managed options.**
 
 ### When the broader product relationship becomes relevant
 
@@ -75,13 +83,16 @@ Exact availability depends on the current product release. Future capabilities r
 
 ### FAQ
 
-**Is this repository an installer or source repository?**  
-No. It is a public commercial discovery repository only.
+**Is this repository a source repository?**  
+No. The main branch is a public commercial/documentation surface. Proprietary implementation remains private.
+
+**Where are customer binaries distributed?**  
+Through GitHub Releases in this repository. The current installer URL above resolves to the latest verified release asset.
 
 **Is KINGAI OPS only for enterprises?**  
 No. The adoption path can begin with individual operators and grow toward larger relationships.
 
-**Does the public repository explain internal server-control methods?**  
+**Does this repository explain internal server-control methods?**  
 No. Implementation remains private.
 
 **Business / MSP / enterprise contact?**  
@@ -93,16 +104,15 @@ vip@kingai.work
 
 ### 先把产品价值看懂，再决定使用到什么深度
 
-KINGAI OPS 面向开发者、企业、基础设施团队和服务商。这个 Public Edition 仓的作用不是发布源码或安装教程，而是帮助用户先理解：它解决什么问题、适合谁、为什么值得使用，以及如何从一台服务器逐步发展到 Fleet、企业和托管运维关系。
+KINGAI OPS 面向开发者、企业、基础设施团队和服务商。这个 Public Edition 主分支的作用不是公开私有源码和内部架构，而是帮助用户理解产品价值、选择使用方式，并提供经过校验的正式 Release 安装入口。
 
-### 为什么需要这个公开入口
+### 当前 Linux 正式版安装
 
-基础设施产品如果只展示技术文档，普通决策者很难判断价值。真正应该先回答的是：
+```bash
+curl -fsSL https://github.com/kingaiwork/kingaiopsfree/releases/latest/download/kingai-install.sh | sudo sh
+```
 
-- 日常运维哪里会更简单；
-- 谁最适合使用；
-- 从一台机器到多机器怎么发展；
-- 什么时候需要团队、企业、MSP或托管服务。
+安装器会识别支持的 Linux 架构，下载对应的无源码发布包，并使用同一 Release 中的 `SHA256SUMS` 校验后再安装。主分支仍保持商业介绍和客户安全文档；可执行文件通过 Releases 分发。
 
 ### 产品价值
 
@@ -110,7 +120,7 @@ KINGAI OPS 面向开发者、企业、基础设施团队和服务商。这个 Pu
 
 ### 采用路径
 
-**发现 → 理解价值 → 使用产品 → 标准化周期工作 → 增加更多系统 → 团队采用 → 评估企业/托管服务。**
+**发现 → 理解价值 → 安装正式 Release → 标准化周期工作 → 增加更多系统 → 团队采用 → 评估企业/托管服务。**
 
 ### 相关产品
 
@@ -118,7 +128,8 @@ OS 提供计算环境，Security 提供保护，Office 提供文档和分析，C
 
 ### 常见问题
 
-**这是安装仓吗？** 不是，只是商业与产品发现入口。  
+**这是源码仓吗？** 不是，主分支是商业与产品发现入口，私有实现不会公开。  
+**安装包在哪里？** 通过本仓库 GitHub Releases 发布，使用上面的 latest 安装入口即可。  
 **只适合大企业吗？** 不是，可以从个人运维开始。  
 **公开内部技术吗？** 不公开。  
 **商务/MSP/企业合作？** vip@kingai.work
